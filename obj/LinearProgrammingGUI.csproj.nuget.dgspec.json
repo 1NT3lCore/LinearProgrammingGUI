@@ -1,25 +1,31 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Shinigami\\LinearProgrammingGUI\\LinearProgrammingGUI\\LinearProgrammingGUI.csproj": {}
+    "D:\\Soft\\VS Projects\\LinearProgrammingGUI\\LinearProgrammingGUI.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Shinigami\\LinearProgrammingGUI\\LinearProgrammingGUI\\LinearProgrammingGUI.csproj": {
+    "D:\\Soft\\VS Projects\\LinearProgrammingGUI\\LinearProgrammingGUI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Shinigami\\LinearProgrammingGUI\\LinearProgrammingGUI\\LinearProgrammingGUI.csproj",
+        "projectUniqueName": "D:\\Soft\\VS Projects\\LinearProgrammingGUI\\LinearProgrammingGUI.csproj",
         "projectName": "LinearProgrammingGUI",
-        "projectPath": "C:\\Users\\Shinigami\\LinearProgrammingGUI\\LinearProgrammingGUI\\LinearProgrammingGUI.csproj",
-        "packagesPath": "C:\\Users\\Shinigami\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Shinigami\\LinearProgrammingGUI\\LinearProgrammingGUI\\obj\\",
+        "projectPath": "D:\\Soft\\VS Projects\\LinearProgrammingGUI\\LinearProgrammingGUI.csproj",
+        "packagesPath": "C:\\Users\\LetteR\\.nuget\\packages\\",
+        "outputPath": "D:\\Soft\\VS Projects\\LinearProgrammingGUI\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\Shinigami\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\LetteR\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net6.0-windows"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -80,7 +86,7 @@
               "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.308\\RuntimeIdentifierGraph.json"
         }
       }
     }

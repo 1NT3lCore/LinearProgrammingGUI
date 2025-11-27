@@ -52,45 +52,55 @@ namespace LinearProgrammingGUI
             btn2.Click += (s, e) => { new OptimalityCheckForm().ShowDialog(); };
             this.Controls.Add(btn2);
 
-            // Заглушки для товарищей
-            Label stubLabel = new Label
+            // Методы решения
+            Label methodsLabel = new Label
             {
-                Text = "Методы товарищей:",
-                Font = new Font("Arial", 9, FontStyle.Italic),
+                Text = "Методы решения:",
+                Font = new Font("Arial", 9, FontStyle.Bold),
                 Location = new Point(100, 175),
                 Size = new Size(300, 20)
             };
-            this.Controls.Add(stubLabel);
+            this.Controls.Add(methodsLabel);
 
-            // Кнопка 3: Первый метод (заглушка)
+            // Кнопка 3: Одновременное решение прямой и двойственной задачи
             Button btn3 = new Button
             {
-                Text = "3. Первый метод",
+                Text = "3. Прямая и двойственная задача",
                 Location = new Point(100, 200),
                 Size = new Size(300, 35),
                 Font = new Font("Arial", 10),
-                Enabled = false
+                Enabled = true
             };
-            btn3.Click += (s, e) => { MessageBox.Show("Метод в разработке", "Информация"); };
+            btn3.Click += (s, e) => { new PrimalDualForm().ShowDialog(); };
             this.Controls.Add(btn3);
 
-            // Кнопка 4: Второй метод (заглушка)
+            // Кнопка 4: Двойственный симплекс-метод
             Button btn4 = new Button
             {
-                Text = "4. Второй метод",
+                Text = "4. Двойственный симплекс-метод",
                 Location = new Point(100, 245),
                 Size = new Size(300, 35),
                 Font = new Font("Arial", 10),
-                Enabled = false
+                Enabled = true
             };
-            btn4.Click += (s, e) => { MessageBox.Show("Метод в разработке", "Информация"); };
+            btn4.Click += (s, e) => { new DualSimplexForm().ShowDialog(); };
             this.Controls.Add(btn4);
 
-            // Кнопка 5: Третий метод (заглушка)
+            // Методы товарищей
+            Label comradesLabel = new Label
+            {
+                Text = "Методы товарищей:",
+                Font = new Font("Arial", 9, FontStyle.Italic),
+                Location = new Point(100, 295),
+                Size = new Size(300, 20)
+            };
+            this.Controls.Add(comradesLabel);
+
+            // Кнопка 5: Первый метод товарища (заглушка)
             Button btn5 = new Button
             {
-                Text = "5. Третий метод",
-                Location = new Point(100, 290),
+                Text = "5. Первый метод",
+                Location = new Point(100, 320),
                 Size = new Size(300, 35),
                 Font = new Font("Arial", 10),
                 Enabled = false
@@ -98,11 +108,11 @@ namespace LinearProgrammingGUI
             btn5.Click += (s, e) => { MessageBox.Show("Метод в разработке", "Информация"); };
             this.Controls.Add(btn5);
 
-            // Кнопка 6: Четвертый метод (заглушка)
+            // Кнопка 6: Второй метод товарища (заглушка)
             Button btn6 = new Button
             {
-                Text = "6. Четвёртый метод",
-                Location = new Point(100, 335),
+                Text = "6. Второй метод",
+                Location = new Point(100, 365),
                 Size = new Size(300, 35),
                 Font = new Font("Arial", 10),
                 Enabled = false
