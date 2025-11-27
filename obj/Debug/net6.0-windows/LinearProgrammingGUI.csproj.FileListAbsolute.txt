@@ -12,18 +12,3 @@ C:\Users\Shinigami\LinearProgrammingGUI\LinearProgrammingGUI\obj\Debug\net6.0-wi
 C:\Users\Shinigami\LinearProgrammingGUI\LinearProgrammingGUI\obj\Debug\net6.0-windows\LinearProgrammingGUI.pdb
 C:\Users\Shinigami\LinearProgrammingGUI\LinearProgrammingGUI\obj\Debug\net6.0-windows\LinearProgrammingGUI.genruntimeconfig.cache
 C:\Users\Shinigami\LinearProgrammingGUI\LinearProgrammingGUI\obj\Debug\net6.0-windows\ref\LinearProgrammingGUI.dll
-D:\Soft\VS Projects\LinearProgrammingGUI\bin\Debug\net6.0-windows\LinearProgrammingGUI.exe
-D:\Soft\VS Projects\LinearProgrammingGUI\bin\Debug\net6.0-windows\LinearProgrammingGUI.deps.json
-D:\Soft\VS Projects\LinearProgrammingGUI\bin\Debug\net6.0-windows\LinearProgrammingGUI.runtimeconfig.json
-D:\Soft\VS Projects\LinearProgrammingGUI\bin\Debug\net6.0-windows\LinearProgrammingGUI.dll
-D:\Soft\VS Projects\LinearProgrammingGUI\bin\Debug\net6.0-windows\LinearProgrammingGUI.pdb
-D:\Soft\VS Projects\LinearProgrammingGUI\obj\Debug\net6.0-windows\LinearProgrammingGUI.GeneratedMSBuildEditorConfig.editorconfig
-D:\Soft\VS Projects\LinearProgrammingGUI\obj\Debug\net6.0-windows\LinearProgrammingGUI.AssemblyInfoInputs.cache
-D:\Soft\VS Projects\LinearProgrammingGUI\obj\Debug\net6.0-windows\LinearProgrammingGUI.AssemblyInfo.cs
-D:\Soft\VS Projects\LinearProgrammingGUI\obj\Debug\net6.0-windows\LinearProgrammingGUI.csproj.CoreCompileInputs.cache
-D:\Soft\VS Projects\LinearProgrammingGUI\obj\Debug\net6.0-windows\LinearProgrammingGUI.sourcelink.json
-D:\Soft\VS Projects\LinearProgrammingGUI\obj\Debug\net6.0-windows\LinearProgrammingGUI.dll
-D:\Soft\VS Projects\LinearProgrammingGUI\obj\Debug\net6.0-windows\refint\LinearProgrammingGUI.dll
-D:\Soft\VS Projects\LinearProgrammingGUI\obj\Debug\net6.0-windows\LinearProgrammingGUI.pdb
-D:\Soft\VS Projects\LinearProgrammingGUI\obj\Debug\net6.0-windows\LinearProgrammingGUI.genruntimeconfig.cache
-D:\Soft\VS Projects\LinearProgrammingGUI\obj\Debug\net6.0-windows\ref\LinearProgrammingGUI.dll
