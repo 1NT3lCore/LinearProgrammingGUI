@@ -52,15 +52,6 @@ namespace LinearProgrammingGUI
             btn2.Click += (s, e) => { new OptimalityCheckForm().ShowDialog(); };
             this.Controls.Add(btn2);
 
-            // Методы решения
-            Label methodsLabel = new Label
-            {
-                Text = "Методы решения:",
-                Font = new Font("Arial", 9, FontStyle.Bold),
-                Location = new Point(100, 175),
-                Size = new Size(300, 20)
-            };
-            this.Controls.Add(methodsLabel);
 
             // Кнопка 3: Одновременное решение прямой и двойственной задачи
             Button btn3 = new Button
@@ -86,38 +77,28 @@ namespace LinearProgrammingGUI
             btn4.Click += (s, e) => { new DualSimplexForm().ShowDialog(); };
             this.Controls.Add(btn4);
 
-            // Методы товарищей
-            Label comradesLabel = new Label
-            {
-                Text = "Методы товарищей:",
-                Font = new Font("Arial", 9, FontStyle.Italic),
-                Location = new Point(100, 295),
-                Size = new Size(300, 20)
-            };
-            this.Controls.Add(comradesLabel);
-
-            // Кнопка 5: Первый метод товарища (заглушка)
+            // Кнопка 5: Симплекс-метод 
             Button btn5 = new Button
             {
-                Text = "5. Первый метод",
-                Location = new Point(100, 320),
+                Text = "5. Симплекс-метод",
+                Location = new Point(100, 290),
                 Size = new Size(300, 35),
                 Font = new Font("Arial", 10),
-                Enabled = false
+                Enabled = true
             };
-            btn5.Click += (s, e) => { MessageBox.Show("Метод в разработке", "Информация"); };
+            btn5.Click += (s, e) => { new SimplexMethodForm().ShowDialog(); };
             this.Controls.Add(btn5);
 
-            // Кнопка 6: Второй метод товарища (заглушка)
+            // Кнопка 6: Транспортная задача 
             Button btn6 = new Button
             {
-                Text = "6. Второй метод",
-                Location = new Point(100, 365),
+                Text = "6. Транспортная задача",
+                Location = new Point(100, 335),
                 Size = new Size(300, 35),
                 Font = new Font("Arial", 10),
-                Enabled = false
+                Enabled = true
             };
-            btn6.Click += (s, e) => { MessageBox.Show("Метод в разработке", "Информация"); };
+            btn6.Click += (s, e) => { new TransportProblemForm().ShowDialog(); };
             this.Controls.Add(btn6);
 
             // Кнопка выхода

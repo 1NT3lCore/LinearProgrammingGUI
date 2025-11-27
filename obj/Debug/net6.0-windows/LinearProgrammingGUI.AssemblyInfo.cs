@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LinearProgrammingGUI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d0c8ba8ae043cf8e6d4a666b58550bbdbb51a366")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b12cf870c394d0835567a00f7fcfbd0c66878643")]
 [assembly: System.Reflection.AssemblyProductAttribute("LinearProgrammingGUI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LinearProgrammingGUI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

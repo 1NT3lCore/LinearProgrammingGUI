@@ -1,0 +1,192 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\\u0421\u0442\u0430\u0441 \u0410\u0437\u0430\u0440\u043E\u0432\\source\\repos\\LinearProgrammingGUI\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A11A8D95-CD2D-3789-85CC-397F473BFDB1}|LinearProgrammingGUI.csproj|c:\\users\\\u0441\u0442\u0430\u0441 \u0430\u0437\u0430\u0440\u043E\u0432\\source\\repos\\linearprogramminggui\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A11A8D95-CD2D-3789-85CC-397F473BFDB1}|LinearProgrammingGUI.csproj|solutionrelative:mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A11A8D95-CD2D-3789-85CC-397F473BFDB1}|LinearProgrammingGUI.csproj|c:\\users\\\u0441\u0442\u0430\u0441 \u0430\u0437\u0430\u0440\u043E\u0432\\source\\repos\\linearprogramminggui\\northwestcornersolver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A11A8D95-CD2D-3789-85CC-397F473BFDB1}|LinearProgrammingGUI.csproj|solutionrelative:northwestcornersolver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A11A8D95-CD2D-3789-85CC-397F473BFDB1}|LinearProgrammingGUI.csproj|c:\\users\\\u0441\u0442\u0430\u0441 \u0430\u0437\u0430\u0440\u043E\u0432\\source\\repos\\linearprogramminggui\\transportproblemform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A11A8D95-CD2D-3789-85CC-397F473BFDB1}|LinearProgrammingGUI.csproj|solutionrelative:transportproblemform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A11A8D95-CD2D-3789-85CC-397F473BFDB1}|LinearProgrammingGUI.csproj|c:\\users\\\u0441\u0442\u0430\u0441 \u0430\u0437\u0430\u0440\u043E\u0432\\source\\repos\\linearprogramminggui\\transportinputform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A11A8D95-CD2D-3789-85CC-397F473BFDB1}|LinearProgrammingGUI.csproj|solutionrelative:transportinputform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A11A8D95-CD2D-3789-85CC-397F473BFDB1}|LinearProgrammingGUI.csproj|c:\\users\\\u0441\u0442\u0430\u0441 \u0430\u0437\u0430\u0440\u043E\u0432\\source\\repos\\linearprogramminggui\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{A11A8D95-CD2D-3789-85CC-397F473BFDB1}|LinearProgrammingGUI.csproj|solutionrelative:mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A11A8D95-CD2D-3789-85CC-397F473BFDB1}|LinearProgrammingGUI.csproj|c:\\users\\\u0441\u0442\u0430\u0441 \u0430\u0437\u0430\u0440\u043E\u0432\\source\\repos\\linearprogramminggui\\simplexmethodform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A11A8D95-CD2D-3789-85CC-397F473BFDB1}|LinearProgrammingGUI.csproj|solutionrelative:simplexmethodform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A11A8D95-CD2D-3789-85CC-397F473BFDB1}|LinearProgrammingGUI.csproj|c:\\users\\\u0441\u0442\u0430\u0441 \u0430\u0437\u0430\u0440\u043E\u0432\\source\\repos\\linearprogramminggui\\simplexmethodform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{A11A8D95-CD2D-3789-85CC-397F473BFDB1}|LinearProgrammingGUI.csproj|solutionrelative:simplexmethodform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A11A8D95-CD2D-3789-85CC-397F473BFDB1}|LinearProgrammingGUI.csproj|c:\\users\\\u0441\u0442\u0430\u0441 \u0430\u0437\u0430\u0440\u043E\u0432\\source\\repos\\linearprogramminggui\\simplexsolver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A11A8D95-CD2D-3789-85CC-397F473BFDB1}|LinearProgrammingGUI.csproj|solutionrelative:simplexsolver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A11A8D95-CD2D-3789-85CC-397F473BFDB1}|LinearProgrammingGUI.csproj|c:\\users\\\u0441\u0442\u0430\u0441 \u0430\u0437\u0430\u0440\u043E\u0432\\source\\repos\\linearprogramminggui\\optimalitycheckform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A11A8D95-CD2D-3789-85CC-397F473BFDB1}|LinearProgrammingGUI.csproj|solutionrelative:optimalitycheckform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A11A8D95-CD2D-3789-85CC-397F473BFDB1}|LinearProgrammingGUI.csproj|c:\\users\\\u0441\u0442\u0430\u0441 \u0430\u0437\u0430\u0440\u043E\u0432\\source\\repos\\linearprogramminggui\\dualtaskform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A11A8D95-CD2D-3789-85CC-397F473BFDB1}|LinearProgrammingGUI.csproj|solutionrelative:dualtaskform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 4,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "NorthWestCornerSolver.cs",
+              "DocumentMoniker": "C:\\Users\\\u0421\u0442\u0430\u0441 \u0410\u0437\u0430\u0440\u043E\u0432\\source\\repos\\LinearProgrammingGUI\\NorthWestCornerSolver.cs",
+              "RelativeDocumentMoniker": "NorthWestCornerSolver.cs",
+              "ToolTip": "C:\\Users\\\u0421\u0442\u0430\u0441 \u0410\u0437\u0430\u0440\u043E\u0432\\source\\repos\\LinearProgrammingGUI\\NorthWestCornerSolver.cs",
+              "RelativeToolTip": "NorthWestCornerSolver.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACgBAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-27T20:11:21.167Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "TransportProblemForm.cs",
+              "DocumentMoniker": "C:\\Users\\\u0421\u0442\u0430\u0441 \u0410\u0437\u0430\u0440\u043E\u0432\\source\\repos\\LinearProgrammingGUI\\TransportProblemForm.cs",
+              "RelativeDocumentMoniker": "TransportProblemForm.cs",
+              "ToolTip": "C:\\Users\\\u0421\u0442\u0430\u0441 \u0410\u0437\u0430\u0440\u043E\u0432\\source\\repos\\LinearProgrammingGUI\\TransportProblemForm.cs",
+              "RelativeToolTip": "TransportProblemForm.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAGEAAABgAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-27T20:03:50.005Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "TransportInputForm.cs",
+              "DocumentMoniker": "C:\\Users\\\u0421\u0442\u0430\u0441 \u0410\u0437\u0430\u0440\u043E\u0432\\source\\repos\\LinearProgrammingGUI\\TransportInputForm.cs",
+              "RelativeDocumentMoniker": "TransportInputForm.cs",
+              "ToolTip": "C:\\Users\\\u0421\u0442\u0430\u0441 \u0410\u0437\u0430\u0440\u043E\u0432\\source\\repos\\LinearProgrammingGUI\\TransportInputForm.cs",
+              "RelativeToolTip": "TransportInputForm.cs",
+              "ViewState": "AgIAALUAAAAAAAAAAADwv8gAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-27T20:02:51.714Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "MainForm.cs",
+              "DocumentMoniker": "C:\\Users\\\u0421\u0442\u0430\u0441 \u0410\u0437\u0430\u0440\u043E\u0432\\source\\repos\\LinearProgrammingGUI\\MainForm.cs",
+              "RelativeDocumentMoniker": "MainForm.cs",
+              "ToolTip": "C:\\Users\\\u0421\u0442\u0430\u0441 \u0410\u0437\u0430\u0440\u043E\u0432\\source\\repos\\LinearProgrammingGUI\\MainForm.cs",
+              "RelativeToolTip": "MainForm.cs",
+              "ViewState": "AgIAAC0AAAAAAAAAAAAYwG4AAAAtAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-27T20:01:11.209Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "MainForm.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
+              "DocumentMoniker": "C:\\Users\\\u0421\u0442\u0430\u0441 \u0410\u0437\u0430\u0440\u043E\u0432\\source\\repos\\LinearProgrammingGUI\\MainForm.cs",
+              "RelativeDocumentMoniker": "MainForm.cs",
+              "ToolTip": "C:\\Users\\\u0421\u0442\u0430\u0441 \u0410\u0437\u0430\u0440\u043E\u0432\\source\\repos\\LinearProgrammingGUI\\MainForm.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
+              "RelativeToolTip": "MainForm.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-27T20:01:09.84Z",
+              "EditorCaption": " [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "SimplexMethodForm.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
+              "DocumentMoniker": "C:\\Users\\\u0421\u0442\u0430\u0441 \u0410\u0437\u0430\u0440\u043E\u0432\\source\\repos\\LinearProgrammingGUI\\SimplexMethodForm.cs",
+              "RelativeDocumentMoniker": "SimplexMethodForm.cs",
+              "ToolTip": "C:\\Users\\\u0421\u0442\u0430\u0441 \u0410\u0437\u0430\u0440\u043E\u0432\\source\\repos\\LinearProgrammingGUI\\SimplexMethodForm.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
+              "RelativeToolTip": "SimplexMethodForm.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-27T20:00:13.618Z",
+              "EditorCaption": " [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "SimplexSolver.cs",
+              "DocumentMoniker": "C:\\Users\\\u0421\u0442\u0430\u0441 \u0410\u0437\u0430\u0440\u043E\u0432\\source\\repos\\LinearProgrammingGUI\\SimplexSolver.cs",
+              "RelativeDocumentMoniker": "SimplexSolver.cs",
+              "ToolTip": "C:\\Users\\\u0421\u0442\u0430\u0441 \u0410\u0437\u0430\u0440\u043E\u0432\\source\\repos\\LinearProgrammingGUI\\SimplexSolver.cs",
+              "RelativeToolTip": "SimplexSolver.cs",
+              "ViewState": "AgIAABoBAAAAAAAAAAAiwDoBAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-27T19:59:44.534Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "SimplexMethodForm.cs",
+              "DocumentMoniker": "C:\\Users\\\u0421\u0442\u0430\u0441 \u0410\u0437\u0430\u0440\u043E\u0432\\source\\repos\\LinearProgrammingGUI\\SimplexMethodForm.cs",
+              "RelativeDocumentMoniker": "SimplexMethodForm.cs",
+              "ToolTip": "C:\\Users\\\u0421\u0442\u0430\u0441 \u0410\u0437\u0430\u0440\u043E\u0432\\source\\repos\\LinearProgrammingGUI\\SimplexMethodForm.cs",
+              "RelativeToolTip": "SimplexMethodForm.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAD8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-27T19:58:54.305Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "OptimalityCheckForm.cs",
+              "DocumentMoniker": "C:\\Users\\\u0421\u0442\u0430\u0441 \u0410\u0437\u0430\u0440\u043E\u0432\\source\\repos\\LinearProgrammingGUI\\OptimalityCheckForm.cs",
+              "RelativeDocumentMoniker": "OptimalityCheckForm.cs",
+              "ToolTip": "C:\\Users\\\u0421\u0442\u0430\u0441 \u0410\u0437\u0430\u0440\u043E\u0432\\source\\repos\\LinearProgrammingGUI\\OptimalityCheckForm.cs",
+              "RelativeToolTip": "OptimalityCheckForm.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-27T19:35:33.852Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "DualTaskForm.cs",
+              "DocumentMoniker": "C:\\Users\\\u0421\u0442\u0430\u0441 \u0410\u0437\u0430\u0440\u043E\u0432\\source\\repos\\LinearProgrammingGUI\\DualTaskForm.cs",
+              "RelativeDocumentMoniker": "DualTaskForm.cs",
+              "ToolTip": "C:\\Users\\\u0421\u0442\u0430\u0441 \u0410\u0437\u0430\u0440\u043E\u0432\\source\\repos\\LinearProgrammingGUI\\DualTaskForm.cs",
+              "RelativeToolTip": "DualTaskForm.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-27T19:35:26.212Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
