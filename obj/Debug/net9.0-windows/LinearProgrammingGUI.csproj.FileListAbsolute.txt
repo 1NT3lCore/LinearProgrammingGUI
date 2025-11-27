@@ -1,0 +1,4 @@
+C:\Users\Shinigami\LinearProgrammingGUI\LinearProgrammingGUI\obj\Debug\net9.0-windows\LinearProgrammingGUI.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Shinigami\LinearProgrammingGUI\LinearProgrammingGUI\obj\Debug\net9.0-windows\LinearProgrammingGUI.AssemblyInfoInputs.cache
+C:\Users\Shinigami\LinearProgrammingGUI\LinearProgrammingGUI\obj\Debug\net9.0-windows\LinearProgrammingGUI.AssemblyInfo.cs
+C:\Users\Shinigami\LinearProgrammingGUI\LinearProgrammingGUI\obj\Debug\net9.0-windows\LinearProgrammingGUI.csproj.CoreCompileInputs.cache

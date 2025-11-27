@@ -1,0 +1,14 @@
+C:\Users\Shinigami\LinearProgrammingGUI\LinearProgrammingGUI\obj\Debug\net6.0-windows\LinearProgrammingGUI.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Shinigami\LinearProgrammingGUI\LinearProgrammingGUI\obj\Debug\net6.0-windows\LinearProgrammingGUI.AssemblyInfoInputs.cache
+C:\Users\Shinigami\LinearProgrammingGUI\LinearProgrammingGUI\obj\Debug\net6.0-windows\LinearProgrammingGUI.AssemblyInfo.cs
+C:\Users\Shinigami\LinearProgrammingGUI\LinearProgrammingGUI\obj\Debug\net6.0-windows\LinearProgrammingGUI.csproj.CoreCompileInputs.cache
+C:\Users\Shinigami\LinearProgrammingGUI\LinearProgrammingGUI\bin\Debug\net6.0-windows\LinearProgrammingGUI.exe
+C:\Users\Shinigami\LinearProgrammingGUI\LinearProgrammingGUI\bin\Debug\net6.0-windows\LinearProgrammingGUI.deps.json
+C:\Users\Shinigami\LinearProgrammingGUI\LinearProgrammingGUI\bin\Debug\net6.0-windows\LinearProgrammingGUI.runtimeconfig.json
+C:\Users\Shinigami\LinearProgrammingGUI\LinearProgrammingGUI\bin\Debug\net6.0-windows\LinearProgrammingGUI.dll
+C:\Users\Shinigami\LinearProgrammingGUI\LinearProgrammingGUI\bin\Debug\net6.0-windows\LinearProgrammingGUI.pdb
+C:\Users\Shinigami\LinearProgrammingGUI\LinearProgrammingGUI\obj\Debug\net6.0-windows\LinearProgrammingGUI.dll
+C:\Users\Shinigami\LinearProgrammingGUI\LinearProgrammingGUI\obj\Debug\net6.0-windows\refint\LinearProgrammingGUI.dll
+C:\Users\Shinigami\LinearProgrammingGUI\LinearProgrammingGUI\obj\Debug\net6.0-windows\LinearProgrammingGUI.pdb
+C:\Users\Shinigami\LinearProgrammingGUI\LinearProgrammingGUI\obj\Debug\net6.0-windows\LinearProgrammingGUI.genruntimeconfig.cache
+C:\Users\Shinigami\LinearProgrammingGUI\LinearProgrammingGUI\obj\Debug\net6.0-windows\ref\LinearProgrammingGUI.dll
