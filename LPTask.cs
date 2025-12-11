@@ -48,14 +48,14 @@ namespace LinearProgrammingGUI
         {
             LPTask task = new LPTask();
             task.n = C.Length;
-            task.m = B.Length; // Исправлено: используем B.Length вместо m
+            task.m = B.Length;
             task.taskType = Maximize ? 1 : 2;
             task.c = C;
             task.A = A;
             task.b = B;
-            task.signs = new string[task.m]; // Исправлено: используем task.m
+            task.signs = new string[task.m]; 
 
-            for (int i = 0; i < task.m; i++) // Исправлено: используем task.m
+            for (int i = 0; i < task.m; i++) 
             {
                 task.signs[i] = IsLessOrEqual[i] ? "<=" : ">=";
             }

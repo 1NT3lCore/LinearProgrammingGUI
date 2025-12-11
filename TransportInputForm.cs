@@ -22,20 +22,22 @@ namespace LinearProgrammingGUI
         private void InitializeComponent()
         {
             this.Text = "Ввод данных транспортной задачи";
-            this.Size = new Size(700, 600);
+            this.Size = new Size(900, 700);
             this.StartPosition = FormStartPosition.CenterScreen;
+            this.MinimumSize = new Size(800, 600);
+            this.MaximizeBox = true;
 
             int yPos = 20;
 
             // Количество поставщиков
             Label lblSuppliers = new Label { Text = "Поставщиков:", Location = new Point(20, yPos), Size = new Size(100, 20) };
-            numSuppliers = new NumericUpDown { Minimum = 1, Maximum = 10, Value = 3, Location = new Point(130, yPos), Size = new Size(60, 20) };
+            numSuppliers = new NumericUpDown { Minimum = 1, Maximum = 15, Value = 3, Location = new Point(130, yPos), Size = new Size(60, 20) };
             this.Controls.Add(lblSuppliers);
             this.Controls.Add(numSuppliers);
 
             // Количество потребителей
             Label lblConsumers = new Label { Text = "Потребителей:", Location = new Point(220, yPos), Size = new Size(100, 20) };
-            numConsumers = new NumericUpDown { Minimum = 1, Maximum = 10, Value = 4, Location = new Point(330, yPos), Size = new Size(60, 20) };
+            numConsumers = new NumericUpDown { Minimum = 1, Maximum = 15, Value = 4, Location = new Point(330, yPos), Size = new Size(60, 20) };
             this.Controls.Add(lblConsumers);
             this.Controls.Add(numConsumers);
 
@@ -52,33 +54,35 @@ namespace LinearProgrammingGUI
             Label lblSupply = new Label { Text = "Запасы поставщиков:", Location = new Point(20, yPos), Size = new Size(150, 20) };
             this.Controls.Add(lblSupply);
 
+            // Метка для потребностей
+            Label lblDemand = new Label { Text = "Потребности потребителей:", Location = new Point(300, yPos), Size = new Size(180, 20) };
+            this.Controls.Add(lblDemand);
+
             yPos += 25;
 
             // Таблица для запасов
             gridSupply = new DataGridView
             {
                 Location = new Point(20, yPos),
-                Size = new Size(200, 150),
+                Size = new Size(250, 200),
                 AllowUserToAddRows = false,
-                RowHeadersVisible = true
+                RowHeadersVisible = true,
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom
             };
             this.Controls.Add(gridSupply);
-
-            // Метка для потребностей
-            Label lblDemand = new Label { Text = "Потребности потребителей:", Location = new Point(250, yPos - 25), Size = new Size(180, 20) };
-            this.Controls.Add(lblDemand);
 
             // Таблица для потребностей
             gridDemand = new DataGridView
             {
-                Location = new Point(250, yPos),
-                Size = new Size(200, 150),
+                Location = new Point(300, yPos),
+                Size = new Size(250, 200),
                 AllowUserToAddRows = false,
-                RowHeadersVisible = true
+                RowHeadersVisible = true,
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom
             };
             this.Controls.Add(gridDemand);
 
-            yPos += 160;
+            yPos += 210;
 
             // Метка для матрицы стоимостей
             Label lblCosts = new Label { Text = "Матрица стоимостей:", Location = new Point(20, yPos), Size = new Size(150, 20) };
@@ -90,21 +94,24 @@ namespace LinearProgrammingGUI
             gridCosts = new DataGridView
             {
                 Location = new Point(20, yPos),
-                Size = new Size(600, 200),
+                Size = new Size(800, 250),
                 AllowUserToAddRows = false,
-                RowHeadersVisible = true
+                RowHeadersVisible = true,
+                Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right
             };
             this.Controls.Add(gridCosts);
 
-            yPos += 210;
+            yPos += 260;
 
             // Кнопки OK и Отмена
             btnOK = new Button { Text = "OK", Location = new Point(200, yPos), Size = new Size(100, 30), Enabled = false };
             btnOK.Click += BtnOK_Click;
+            btnOK.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.Controls.Add(btnOK);
 
             btnCancel = new Button { Text = "Отмена", Location = new Point(320, yPos), Size = new Size(100, 30) };
             btnCancel.Click += (s, e) => { this.Close(); };
+            btnCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.Controls.Add(btnCancel);
         }
 
@@ -140,7 +147,7 @@ namespace LinearProgrammingGUI
             for (int j = 0; j < consumers; j++)
             {
                 gridCosts.Columns.Add($"cost{j}", $"П{j + 1}");
-                gridCosts.Columns[j].Width = 60;
+                gridCosts.Columns[j].Width = 80;
             }
             gridCosts.Rows.Clear();
             for (int i = 0; i < suppliers; i++)

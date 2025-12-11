@@ -4,254 +4,433 @@ using System.Windows.Forms;
 
 namespace LinearProgrammingGUI
 {
-    public class InputTaskForm : Form
+    public partial class InputTaskForm : Form
     {
-        private NumericUpDown numN, numM;
-        private ComboBox cmbTaskType;
-        private DataGridView gridC, gridA, gridB, gridSigns;
-        private Button btnOK, btnCancel;
+        // Публичные свойства для доступа к результатам
         public LPTask Task { get; private set; }
-        public bool IsCompleted { get; private set; }
+        public bool IsCompleted { get; private set; } = false;
+
+        // Поля для ввода данных
+        private NumericUpDown numVariables, numConstraints;
+        private RadioButton radioMax, radioMin;
+        private Button btnNext, btnCancel;
+        private Label lblStep;
+        private Panel inputPanel;
+        private int currentStep = 0;
+
+        // Данные задачи
+        private double[] c; // Коэффициенты целевой функции
+        private double[,] A; // Матрица ограничений
+        private double[] b; // Правые части ограничений
+        private string[] signs; // Знаки ограничений
 
         public InputTaskForm()
         {
             InitializeComponent();
+            ShowStep1();
         }
 
         private void InitializeComponent()
         {
-            this.Text = "Ввод задачи ЛП";
-            this.Size = new Size(700, 600);
+            this.Text = "Ввод задачи линейного программирования";
+            this.Size = new Size(900, 600);
             this.StartPosition = FormStartPosition.CenterScreen;
+            this.MinimumSize = new Size(800, 500);
+            this.MaximizeBox = false;
 
-            int yPos = 20;
-
-            // Количество переменных
-            Label lblN = new Label { Text = "Переменных (n):", Location = new Point(20, yPos), Size = new Size(120, 20) };
-            numN = new NumericUpDown { Minimum = 1, Maximum = 10, Value = 2, Location = new Point(150, yPos), Size = new Size(60, 20) };
-            this.Controls.Add(lblN);
-            this.Controls.Add(numN);
-
-            yPos += 30;
-
-            // Количество ограничений
-            Label lblM = new Label { Text = "Ограничений (m):", Location = new Point(20, yPos), Size = new Size(120, 20) };
-            numM = new NumericUpDown { Minimum = 1, Maximum = 10, Value = 2, Location = new Point(150, yPos), Size = new Size(60, 20) };
-            this.Controls.Add(lblM);
-            this.Controls.Add(numM);
-
-            yPos += 30;
-
-            // Тип задачи
-            Label lblType = new Label { Text = "Тип задачи:", Location = new Point(20, yPos), Size = new Size(120, 20) };
-            cmbTaskType = new ComboBox { Location = new Point(150, yPos), Size = new Size(150, 20) };
-            cmbTaskType.Items.AddRange(new string[] { "Максимизация", "Минимизация" });
-            cmbTaskType.SelectedIndex = 0;
-            cmbTaskType.DropDownStyle = ComboBoxStyle.DropDownList;
-            this.Controls.Add(lblType);
-            this.Controls.Add(cmbTaskType);
-
-            yPos += 40;
-
-            // Кнопка создания таблиц
-            Button btnCreate = new Button { Text = "Создать таблицы", Location = new Point(20, yPos), Size = new Size(200, 30) };
-            btnCreate.Click += BtnCreate_Click;
-            this.Controls.Add(btnCreate);
-
-            yPos += 50;
-
-            // Метка для коэффициентов c
-            Label lblC = new Label { Text = "Коэффициенты целевой функции (c):", Location = new Point(20, yPos), Size = new Size(300, 20) };
-            this.Controls.Add(lblC);
-
-            yPos += 25;
-
-            // Таблица для c
-            gridC = new DataGridView
+            // Заголовок шага
+            lblStep = new Label
             {
-                Location = new Point(20, yPos),
-                Size = new Size(300, 60),
-                AllowUserToAddRows = false,
-                RowHeadersVisible = false
+                Text = "ШАГ 1: ОБЩИЕ ПАРАМЕТРЫ ЗАДАЧИ",
+                Font = new Font("Arial", 12, FontStyle.Bold),
+                Location = new Point(20, 20),
+                Size = new Size(850, 30),
+                ForeColor = Color.DarkBlue
             };
-            this.Controls.Add(gridC);
+            this.Controls.Add(lblStep);
 
-            yPos += 70;
-
-            // Метка для матрицы A
-            Label lblA = new Label { Text = "Матрица ограничений (A):", Location = new Point(20, yPos), Size = new Size(300, 20) };
-            this.Controls.Add(lblA);
-
-            yPos += 25;
-
-            // Таблица для A
-            gridA = new DataGridView
+            // Панель для ввода данных
+            inputPanel = new Panel
             {
-                Location = new Point(20, yPos),
-                Size = new Size(400, 120),
-                AllowUserToAddRows = false,
-                RowHeadersVisible = true
+                Location = new Point(20, 60),
+                Size = new Size(850, 400),
+                BorderStyle = BorderStyle.FixedSingle,
+                BackColor = Color.WhiteSmoke
             };
-            this.Controls.Add(gridA);
+            this.Controls.Add(inputPanel);
 
-            yPos += 130;
-
-            // Метка для b
-            Label lblB = new Label { Text = "Правые части (b):", Location = new Point(20, yPos), Size = new Size(150, 20) };
-            this.Controls.Add(lblB);
-
-            yPos += 25;
-
-            // Таблица для b
-            gridB = new DataGridView
+            // Кнопка Далее
+            btnNext = new Button
             {
-                Location = new Point(20, yPos),
-                Size = new Size(150, 60),
-                AllowUserToAddRows = false,
-                RowHeadersVisible = false
+                Text = "Далее",
+                Location = new Point(600, 480),
+                Size = new Size(120, 35),
+                Font = new Font("Arial", 10),
+                BackColor = Color.LightGreen
             };
-            this.Controls.Add(gridB);
+            btnNext.Click += BtnNext_Click;
+            this.Controls.Add(btnNext);
 
-            // Метка для знаков
-            Label lblSigns = new Label { Text = "Знаки:", Location = new Point(200, yPos - 25), Size = new Size(100, 20) };
-            this.Controls.Add(lblSigns);
-
-            // Таблица для знаков
-            gridSigns = new DataGridView
+            // Кнопка Отмена
+            btnCancel = new Button
             {
-                Location = new Point(200, yPos),
-                Size = new Size(150, 60),
-                AllowUserToAddRows = false,
-                RowHeadersVisible = false
+                Text = "Отмена",
+                Location = new Point(730, 480),
+                Size = new Size(120, 35),
+                Font = new Font("Arial", 10),
+                BackColor = Color.LightCoral
             };
-            this.Controls.Add(gridSigns);
-
-            yPos += 80;
-
-            // Кнопки OK и Отмена
-            btnOK = new Button { Text = "OK", Location = new Point(150, yPos), Size = new Size(100, 30) };
-            btnOK.Click += BtnOK_Click;
-            this.Controls.Add(btnOK);
-
-            btnCancel = new Button { Text = "Отмена", Location = new Point(270, yPos), Size = new Size(100, 30) };
-            btnCancel.Click += (s, e) => { this.Close(); };
+            btnCancel.Click += (s, e) =>
+            {
+                this.DialogResult = DialogResult.Cancel;
+                this.Close();
+            };
             this.Controls.Add(btnCancel);
         }
 
-        private void BtnCreate_Click(object sender, EventArgs e)
+        private void ShowStep1()
         {
-            int n = (int)numN.Value;
-            int m = (int)numM.Value;
+            currentStep = 1;
+            lblStep.Text = "ШАГ 1: ОБЩИЕ ПАРАМЕТРЫ ЗАДАЧИ";
+            inputPanel.Controls.Clear();
 
-            // Создаем таблицу для c
-            gridC.Columns.Clear();
+            // Количество переменных
+            Label lblVariables = new Label
+            {
+                Text = "Количество переменных (n):",
+                Location = new Point(20, 20),
+                Size = new Size(200, 25),
+                Font = new Font("Arial", 10)
+            };
+            inputPanel.Controls.Add(lblVariables);
+
+            numVariables = new NumericUpDown
+            {
+                Location = new Point(250, 20),
+                Size = new Size(100, 25),
+                Minimum = 1,
+                Maximum = 20,
+                Value = 2,
+                Font = new Font("Arial", 10)
+            };
+            inputPanel.Controls.Add(numVariables);
+
+            // Количество ограничений
+            Label lblConstraints = new Label
+            {
+                Text = "Количество ограничений (m):",
+                Location = new Point(20, 60),
+                Size = new Size(200, 25),
+                Font = new Font("Arial", 10)
+            };
+            inputPanel.Controls.Add(lblConstraints);
+
+            numConstraints = new NumericUpDown
+            {
+                Location = new Point(250, 60),
+                Size = new Size(100, 25),
+                Minimum = 1,
+                Maximum = 20,
+                Value = 2,
+                Font = new Font("Arial", 10)
+            };
+            inputPanel.Controls.Add(numConstraints);
+
+            // Тип задачи
+            Label lblTaskType = new Label
+            {
+                Text = "Тип задачи:",
+                Location = new Point(20, 100),
+                Size = new Size(200, 25),
+                Font = new Font("Arial", 10)
+            };
+            inputPanel.Controls.Add(lblTaskType);
+
+            radioMax = new RadioButton
+            {
+                Text = "Максимизация (F → max)",
+                Location = new Point(250, 100),
+                Size = new Size(200, 25),
+                Font = new Font("Arial", 10),
+                Checked = true
+            };
+            inputPanel.Controls.Add(radioMax);
+
+            radioMin = new RadioButton
+            {
+                Text = "Минимизация (F → min)",
+                Location = new Point(250, 130),
+                Size = new Size(200, 25),
+                Font = new Font("Arial", 10)
+            };
+            inputPanel.Controls.Add(radioMin);
+        }
+
+        private void ShowStep2()
+        {
+            currentStep = 2;
+            lblStep.Text = "ШАГ 2: ЦЕЛЕВАЯ ФУНКЦИЯ";
+            inputPanel.Controls.Clear();
+            btnNext.Text = "Далее";
+
+            int n = (int)numVariables.Value;
+            c = new double[n];
+
+            Label lblInstruction = new Label
+            {
+                Text = $"Введите коэффициенты целевой функции для {n} переменных:",
+                Location = new Point(20, 20),
+                Size = new Size(800, 25),
+                Font = new Font("Arial", 10, FontStyle.Bold)
+            };
+            inputPanel.Controls.Add(lblInstruction);
+
+            // Ввод коэффициентов целевой функции
             for (int i = 0; i < n; i++)
             {
-                gridC.Columns.Add($"c{i + 1}", $"c[{i + 1}]");
-                gridC.Columns[i].Width = 50;
-            }
-            gridC.Rows.Add();
+                Label lblCoeff = new Label
+                {
+                    Text = $"c[{i + 1}] (коэффициент при x{i + 1}):",
+                    Location = new Point(20, 60 + i * 40),
+                    Size = new Size(200, 25),
+                    Font = new Font("Arial", 10)
+                };
+                inputPanel.Controls.Add(lblCoeff);
 
-            // Создаем таблицу для A
-            gridA.Columns.Clear();
-            for (int j = 0; j < n; j++)
-            {
-                gridA.Columns.Add($"a{j + 1}", $"x{j + 1}");
-                gridA.Columns[j].Width = 60;
-            }
-            for (int i = 0; i < m; i++)
-            {
-                gridA.Rows.Add();
-                gridA.Rows[i].HeaderCell.Value = $"Огр {i + 1}";
-            }
-
-            // Создаем таблицу для b
-            gridB.Columns.Clear();
-            gridB.Columns.Add("b", "b");
-            gridB.Columns[0].Width = 100;
-            for (int i = 0; i < m; i++)
-            {
-                gridB.Rows.Add();
-            }
-
-            // Создаем таблицу для знаков
-            gridSigns.Columns.Clear();
-            DataGridViewComboBoxColumn signColumn = new DataGridViewComboBoxColumn
-            {
-                Name = "sign",
-                HeaderText = "Знак",
-                Width = 100
-            };
-            signColumn.Items.AddRange("<=", ">=", "=");
-            gridSigns.Columns.Add(signColumn);
-            for (int i = 0; i < m; i++)
-            {
-                gridSigns.Rows.Add();
-                gridSigns.Rows[i].Cells[0].Value = "<=";
+                NumericUpDown numCoeff = new NumericUpDown
+                {
+                    Location = new Point(250, 60 + i * 40),
+                    Size = new Size(100, 25),
+                    DecimalPlaces = 2,
+                    Minimum = -1000,
+                    Maximum = 1000,
+                    Value = 0,
+                    Font = new Font("Arial", 10),
+                    Tag = i // Сохраняем индекс для доступа
+                };
+                numCoeff.ValueChanged += (s, e) =>
+                {
+                    int index = (int)((NumericUpDown)s).Tag;
+                    c[index] = (double)((NumericUpDown)s).Value;
+                };
+                inputPanel.Controls.Add(numCoeff);
             }
         }
 
-        private void BtnOK_Click(object sender, EventArgs e)
+        private void ShowStep3()
+        {
+            currentStep = 3;
+            lblStep.Text = "ШАГ 3: ОГРАНИЧЕНИЯ";
+            inputPanel.Controls.Clear();
+            btnNext.Text = "Завершить";
+
+            int n = (int)numVariables.Value;
+            int m = (int)numConstraints.Value;
+            A = new double[m, n];
+            b = new double[m];
+            signs = new string[m];
+
+            Label lblInstruction = new Label
+            {
+                Text = $"Введите {m} ограничений для {n} переменных:",
+                Location = new Point(20, 20),
+                Size = new Size(800, 25),
+                Font = new Font("Arial", 10, FontStyle.Bold)
+            };
+            inputPanel.Controls.Add(lblInstruction);
+
+            // Ввод ограничений
+            for (int i = 0; i < m; i++)
+            {
+                Label lblConstraint = new Label
+                {
+                    Text = $"Ограничение {i + 1}:",
+                    Location = new Point(20, 60 + i * 80),
+                    Size = new Size(150, 25),
+                    Font = new Font("Arial", 10)
+                };
+                inputPanel.Controls.Add(lblConstraint);
+
+                // Ввод коэффициентов ограничения
+                for (int j = 0; j < n; j++)
+                {
+                    Label lblVar = new Label
+                    {
+                        Text = $"x{j + 1}:",
+                        Location = new Point(180 + j * 80, 60 + i * 80),
+                        Size = new Size(30, 25),
+                        Font = new Font("Arial", 10)
+                    };
+                    inputPanel.Controls.Add(lblVar);
+
+                    NumericUpDown numCoeff = new NumericUpDown
+                    {
+                        Location = new Point(210 + j * 80, 60 + i * 80),
+                        Size = new Size(60, 25),
+                        DecimalPlaces = 2,
+                        Minimum = -1000,
+                        Maximum = 1000,
+                        Value = 0,
+                        Font = new Font("Arial", 10),
+                        Tag = new Tuple<int, int>(i, j) // Индексы i, j
+                    };
+                    numCoeff.ValueChanged += (s, e) =>
+                    {
+                        var indices = (Tuple<int, int>)((NumericUpDown)s).Tag;
+                        A[indices.Item1, indices.Item2] = (double)((NumericUpDown)s).Value;
+                    };
+                    inputPanel.Controls.Add(numCoeff);
+                }
+
+                // Знак ограничения
+                ComboBox cmbSign = new ComboBox
+                {
+                    Location = new Point(180 + n * 80, 60 + i * 80),
+                    Size = new Size(50, 25),
+                    Font = new Font("Arial", 10),
+                    Tag = i // Индекс ограничения
+                };
+                cmbSign.Items.AddRange(new string[] { "<=", ">=", "=" });
+                cmbSign.SelectedIndex = 0;
+                cmbSign.SelectedIndexChanged += (s, e) =>
+                {
+                    int index = (int)((ComboBox)s).Tag;
+                    signs[index] = (string)((ComboBox)s).SelectedItem;
+                };
+                inputPanel.Controls.Add(cmbSign);
+                signs[i] = "<="; // Значение по умолчанию
+
+                // Правая часть
+                Label lblRight = new Label
+                {
+                    Text = "b =",
+                    Location = new Point(240 + n * 80, 60 + i * 80),
+                    Size = new Size(30, 25),
+                    Font = new Font("Arial", 10)
+                };
+                inputPanel.Controls.Add(lblRight);
+
+                NumericUpDown numRight = new NumericUpDown
+                {
+                    Location = new Point(275 + n * 80, 60 + i * 80),
+                    Size = new Size(80, 25),
+                    DecimalPlaces = 2,
+                    Minimum = -1000,
+                    Maximum = 1000,
+                    Value = 0,
+                    Font = new Font("Arial", 10),
+                    Tag = i // Индекс ограничения
+                };
+                numRight.ValueChanged += (s, e) =>
+                {
+                    int index = (int)((NumericUpDown)s).Tag;
+                    b[index] = (double)((NumericUpDown)s).Value;
+                };
+                inputPanel.Controls.Add(numRight);
+            }
+        }
+
+        private void BtnNext_Click(object sender, EventArgs e)
         {
             try
             {
-                int n = (int)numN.Value;
-                int m = (int)numM.Value;
-
-                LPTask task = new LPTask
+                if (currentStep == 1)
                 {
-                    n = n,
-                    m = m,
-                    taskType = cmbTaskType.SelectedIndex + 1,
-                    c = new double[n],
-                    b = new double[m],
-                    A = new double[m, n],
-                    signs = new string[m]
-                };
-
-                // Читаем c
-                for (int i = 0; i < n; i++)
-                {
-                    if (gridC.Rows[0].Cells[i].Value == null)
-                        throw new Exception($"Не введено значение c[{i + 1}]");
-                    task.c[i] = Convert.ToDouble(gridC.Rows[0].Cells[i].Value);
+                    // Переход ко второму шагу
+                    ShowStep2();
                 }
-
-                // Читаем A
-                for (int i = 0; i < m; i++)
+                else if (currentStep == 2)
                 {
-                    for (int j = 0; j < n; j++)
+                    // Проверка целевой функции
+                    bool allZero = true;
+                    for (int i = 0; i < c.Length; i++)
                     {
-                        if (gridA.Rows[i].Cells[j].Value == null)
-                            throw new Exception($"Не введено значение A[{i + 1},{j + 1}]");
-                        task.A[i, j] = Convert.ToDouble(gridA.Rows[i].Cells[j].Value);
+                        if (Math.Abs(c[i]) > 0.001)
+                        {
+                            allZero = false;
+                            break;
+                        }
                     }
-                }
 
-                // Читаем b
-                for (int i = 0; i < m; i++)
+                    if (allZero)
+                    {
+                        DialogResult result = MessageBox.Show(
+                            "Все коэффициенты целевой функции равны нулю. Продолжить?",
+                            "Предупреждение",
+                            MessageBoxButtons.YesNo,
+                            MessageBoxIcon.Warning);
+
+                        if (result == DialogResult.No)
+                        {
+                            return;
+                        }
+                    }
+
+                    // Переход к третьему шагу
+                    ShowStep3();
+                }
+                else if (currentStep == 3)
                 {
-                    if (gridB.Rows[i].Cells[0].Value == null)
-                        throw new Exception($"Не введено значение b[{i + 1}]");
-                    task.b[i] = Convert.ToDouble(gridB.Rows[i].Cells[0].Value);
-                }
+                    // Проверка ограничений
+                    for (int i = 0; i < signs.Length; i++)
+                    {
+                        if (string.IsNullOrEmpty(signs[i]))
+                        {
+                            signs[i] = "<="; // Значение по умолчанию
+                        }
+                    }
 
-                // Читаем знаки
-                for (int i = 0; i < m; i++)
-                {
-                    if (gridSigns.Rows[i].Cells[0].Value == null)
-                        throw new Exception($"Не выбран знак для ограничения {i + 1}");
-                    task.signs[i] = gridSigns.Rows[i].Cells[0].Value.ToString();
-                }
+                    // Создание задачи
+                    Task = new LPTask
+                    {
+                        n = (int)numVariables.Value,
+                        m = (int)numConstraints.Value,
+                        taskType = radioMax.Checked ? 1 : 2,
+                        c = c,
+                        A = A,
+                        b = b,
+                        signs = signs
+                    };
 
-                this.Task = task;
-                this.IsCompleted = true;
-                this.Close();
+                    Console.WriteLine($"Task created: n={Task.n}, m={Task.m}, type={Task.taskType}");
+                    Console.WriteLine($"c length: {Task.c?.Length}, A dimensions: {Task.A?.GetLength(0)}x{Task.A?.GetLength(1)}");
+
+                    // Установка флагов
+                    IsCompleted = true;
+                    this.DialogResult = DialogResult.OK;
+
+                    Console.WriteLine($"IsCompleted set to: {IsCompleted}");
+                    Console.WriteLine($"DialogResult set to: {this.DialogResult}");
+
+                    this.Close();
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка: {ex.Message}", "Ошибка ввода", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Ошибка: {ex.Message}", "Ошибка", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Console.WriteLine($"Error in BtnNext_Click: {ex.Message}");
+                Console.WriteLine($"StackTrace: {ex.StackTrace}");
             }
+        }
+
+        // Метод для быстрой отладки - создание тестовой задачи
+        public void CreateTestTask()
+        {
+            // Тестовая задача: максимизация 3x1 + 5x2
+            // Ограничения: x1 ≤ 4, 2x2 ≤ 12, 3x1 + 2x2 ≤ 18
+            Task = new LPTask
+            {
+                n = 2,
+                m = 3,
+                taskType = 1, // максимизация
+                c = new double[] { 3, 5 },
+                A = new double[,] { { 1, 0 }, { 0, 2 }, { 3, 2 } },
+                b = new double[] { 4, 12, 18 },
+                signs = new string[] { "<=", "<=", "<=" }
+            };
+
+            IsCompleted = true;
         }
     }
 }

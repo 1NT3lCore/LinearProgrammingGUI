@@ -8,31 +8,24 @@
     "net6.0-windows7.0": []
   },
   "packageFolders": {
-    "C:\\Users\\Стас Азаров\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\Shinigami\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Стас Азаров\\Source\\Repos\\LinearProgrammingGUI\\LinearProgrammingGUI.csproj",
+      "projectUniqueName": "C:\\Users\\Shinigami\\Desktop\\SYNC\\LinearProgrammingGUI\\LinearProgrammingGUI.csproj",
       "projectName": "LinearProgrammingGUI",
-      "projectPath": "C:\\Users\\Стас Азаров\\Source\\Repos\\LinearProgrammingGUI\\LinearProgrammingGUI.csproj",
-      "packagesPath": "C:\\Users\\Стас Азаров\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Стас Азаров\\Source\\Repos\\LinearProgrammingGUI\\obj\\",
+      "projectPath": "C:\\Users\\Shinigami\\Desktop\\SYNC\\LinearProgrammingGUI\\LinearProgrammingGUI.csproj",
+      "packagesPath": "C:\\Users\\Shinigami\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Shinigami\\Desktop\\SYNC\\LinearProgrammingGUI\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\Стас Азаров\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Users\\Shinigami\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net6.0-windows"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -67,6 +60,24 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[6.0.36, 6.0.36]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Host.win-x64",
+            "version": "[6.0.36, 6.0.36]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Ref",
+            "version": "[6.0.36, 6.0.36]"
+          },
+          {
+            "name": "Microsoft.WindowsDesktop.App.Ref",
+            "version": "[6.0.36, 6.0.36]"
+          }
+        ],
         "frameworkReferences": {
           "Microsoft.NETCore.App": {
             "privateAssets": "all"
@@ -75,7 +86,7 @@
             "privateAssets": "none"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.306\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304\\RuntimeIdentifierGraph.json"
       }
     }
   }
