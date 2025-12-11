@@ -10,6 +10,9 @@
     <Compile Update="InputTaskForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="LinearSystemForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -13,303 +13,771 @@ namespace LinearProgrammingGUI
         private List<int> basis;
         private int stepCount = 0;
         private LPTask task;
+        private int totalVars;
+        private int artificialCount;
+        private int slackCount;
+        private StringBuilder log;
+        private bool useTwoPhase = false;
 
         public SimplexSolver(LPTask lpTask)
         {
             this.task = lpTask;
+            this.log = new StringBuilder();
 
-            // Преобразуем задачу в каноническую форму для симплекс-метода
-            var canonical = ConvertToCanonicalForm(lpTask);
-
-            rows = canonical.constraints.GetLength(0) + 1;
-            cols = canonical.constraints.GetLength(1) + canonical.constraints.GetLength(0) + 1;
-
-            table = new double[rows, cols];
-            basis = new List<int>();
-
-            InitializeTable(canonical.objective, canonical.constraints, canonical.rightHandSide);
-        }
-
-        private (double[] objective, double[,] constraints, double[] rightHandSide) ConvertToCanonicalForm(LPTask task)
-        {
-            int slackVars = task.m;
-            int totalVars = task.n + slackVars;
-
-            // Целевая функция (для максимизации оставляем как есть, для минимизации меняем знак)
-            double[] objective = new double[totalVars];
-            for (int i = 0; i < task.n; i++)
+            // Проверяем корректность задачи
+            if (task.n == 0 || task.m == 0)
             {
-                objective[i] = task.taskType == 1 ? task.c[i] : -task.c[i];
+                log.AppendLine("❌ Ошибка: задача некорректна (нулевая размерность)");
+                return;
             }
 
-            // Матрица ограничений с slack переменными
-            double[,] constraints = new double[task.m, totalVars];
-            double[] rightHandSide = new double[task.m];
+            // Анализируем задачу
+            useTwoPhase = task.signs.Any(s => s == "=") || task.signs.Any(s => s == ">=");
 
-            for (int i = 0; i < task.m; i++)
+            if (useTwoPhase)
             {
-                for (int j = 0; j < task.n; j++)
-                {
-                    constraints[i, j] = task.A[i, j];
-                }
-
-                // Добавляем slack переменные
-                if (task.signs[i] == "<=")
-                {
-                    constraints[i, task.n + i] = 1; // + slack
-                }
-                else if (task.signs[i] == ">=")
-                {
-                    constraints[i, task.n + i] = -1; // - slack
-                }
-                // Для "=" не добавляем slack
-
-                rightHandSide[i] = task.b[i];
+                log.AppendLine("⚠️ Используем ДВУХФАЗНЫЙ симплекс-метод.");
+                SolveTwoPhase();
             }
-
-            return (objective, constraints, rightHandSide);
-        }
-
-        private void InitializeTable(double[] objectiveFunction, double[,] constraints, double[] rightHandSide)
-        {
-            // Целевая функция (в симплекс-таблице для минимизации)
-            for (int j = 0; j < objectiveFunction.Length; j++)
+            else
             {
-                table[0, j] = -objectiveFunction[j];
-            }
-            table[0, cols - 1] = 0;
-
-            // Ограничения
-            for (int i = 0; i < constraints.GetLength(0); i++)
-            {
-                for (int j = 0; j < constraints.GetLength(1); j++)
-                {
-                    table[i + 1, j] = constraints[i, j];
-                }
-
-                // Правая часть
-                table[i + 1, cols - 1] = rightHandSide[i];
-
-                // Добавляем в базис slack переменные
-                if (constraints[i, task.n + i] == 1) // Только для slack переменных
-                {
-                    basis.Add(task.n + i);
-                }
+                log.AppendLine("✅ Используем ОДНОФАЗНЫЙ симплекс-метод.");
+                SolveSinglePhase();
             }
         }
 
-        public string SolveWithSteps()
+        private void SolveTwoPhase()
         {
-            StringBuilder sb = new StringBuilder();
-            sb.AppendLine("═══════════════════════════════════════════════════");
-            sb.AppendLine("РЕШЕНИЕ СИМПЛЕКС-МЕТОДОМ");
-            sb.AppendLine("═══════════════════════════════════════════════════");
+            log.AppendLine("\n═══════════════════════════════════════════════════");
+            log.AppendLine("ФАЗА I: Поиск допустимого решения");
+            log.AppendLine("═══════════════════════════════════════════════════");
 
-            sb.AppendLine("\nНачальная симплекс-таблица:");
-            sb.AppendLine(GetTableString());
+            // Шаг 1: Строим задачу для фазы I
+            var phase1Data = BuildPhase1Problem();
 
-            int pivotCol, pivotRow;
-
-            while (!IsOptimal())
+            if (phase1Data.table == null)
             {
+                log.AppendLine("❌ Ошибка построения задачи фазы I");
+                return;
+            }
+
+            // Шаг 2: Решаем фазу I
+            bool phase1Result = SolvePhase1(phase1Data.table, phase1Data.basis);
+
+            if (!phase1Result)
+            {
+                log.AppendLine("\n❌ Задача не имеет допустимого решения!");
+                return;
+            }
+
+            log.AppendLine("\n═══════════════════════════════════════════════════");
+            log.AppendLine("ФАЗА II: Оптимизация целевой функции");
+            log.AppendLine("═══════════════════════════════════════════════════");
+
+            // Шаг 3: Строим задачу для фазы II
+            var phase2Data = BuildPhase2Problem();
+
+            if (phase2Data.table == null)
+            {
+                log.AppendLine("❌ Ошибка построения задачи фазы II");
+                return;
+            }
+
+            // Шаг 4: Решаем фазу II
+            SolvePhase2(phase2Data.table, phase2Data.basis);
+        }
+
+        private (double[,] table, List<int> basis) BuildPhase1Problem()
+        {
+            try
+            {
+                // Подсчитываем вспомогательные переменные
+                CountAuxiliaryVariables();
+                totalVars = task.n + slackCount + artificialCount;
+
+                // Проверяем корректность
+                if (totalVars <= 0)
+                {
+                    log.AppendLine("❌ Ошибка: некорректное количество переменных");
+                    return (null, null);
+                }
+
+                // Строим начальную таблицу
+                rows = task.m + 1;
+                cols = totalVars + 1;
+                double[,] table = new double[rows, cols];
+                List<int> basis = new List<int>();
+
+                int slackIndex = 0;
+                int artificialIndex = 0;
+
+                // Заполняем таблицу ограничений
+                for (int i = 0; i < task.m; i++)
+                {
+                    // Основные переменные
+                    for (int j = 0; j < task.n; j++)
+                    {
+                        table[i + 1, j] = task.A[i, j];
+                    }
+
+                    // Правая часть
+                    table[i + 1, cols - 1] = task.b[i];
+
+                    // Slack и искусственные переменные
+                    if (task.signs[i] == "<=")
+                    {
+                        int slackPos = task.n + slackIndex;
+                        table[i + 1, slackPos] = 1;
+                        basis.Add(slackPos);
+                        slackIndex++;
+                    }
+                    else if (task.signs[i] == ">=")
+                    {
+                        int slackPos = task.n + slackIndex;
+                        int artPos = task.n + slackCount + artificialIndex;
+
+                        table[i + 1, slackPos] = -1;
+                        table[i + 1, artPos] = 1;
+                        basis.Add(artPos);
+
+                        slackIndex++;
+                        artificialIndex++;
+                    }
+                    else if (task.signs[i] == "=")
+                    {
+                        int artPos = task.n + slackCount + artificialIndex;
+                        table[i + 1, artPos] = 1;
+                        basis.Add(artPos);
+                        artificialIndex++;
+                    }
+                }
+
+                // Целевая строка фазы I: W = -ΣR (минимизация суммы искусственных переменных)
+                for (int j = 0; j < totalVars; j++)
+                {
+                    table[0, j] = 0;
+                }
+                for (int i = task.n + slackCount; i < totalVars; i++)
+                {
+                    table[0, i] = 1; // Коэффициент 1 для искусственных переменных
+                }
+                table[0, cols - 1] = 0;
+
+                // Преобразуем целевую функцию для исключения искусственных переменных из базиса
+                for (int i = 0; i < basis.Count; i++)
+                {
+                    int basisVar = basis[i];
+                    if (basisVar >= task.n + slackCount) // Искусственная переменная
+                    {
+                        double coeff = table[0, basisVar];
+                        for (int j = 0; j < cols; j++)
+                        {
+                            table[0, j] -= coeff * table[i + 1, j];
+                        }
+                    }
+                }
+
+                log.AppendLine($"\nПеременные: {totalVars} (исходные: {task.n}, slack: {slackCount}, искусственные: {artificialCount})");
+                log.AppendLine("Начальная таблица фазы I:");
+                log.AppendLine(GetTableString(table, basis));
+
+                return (table, basis);
+            }
+            catch (Exception ex)
+            {
+                log.AppendLine($"❌ Ошибка в BuildPhase1Problem: {ex.Message}");
+                return (null, null);
+            }
+        }
+
+        private bool SolvePhase1(double[,] table, List<int> basis)
+        {
+            if (table == null || basis == null) return false;
+
+            int iteration = 0;
+            int maxIterations = 100;
+
+            while (iteration < maxIterations)
+            {
+                iteration++;
                 stepCount++;
-                sb.AppendLine($"\n═══════════════════════════════════════════════════");
-                sb.AppendLine($"ШАГ {stepCount}");
-                sb.AppendLine($"═══════════════════════════════════════════════════");
 
-                pivotCol = FindPivotColumn();
-                if (pivotCol == -1) break;
+                log.AppendLine($"\n═══════════════════════════════════════════════════");
+                log.AppendLine($"ФАЗА I - ИТЕРАЦИЯ {iteration}:");
+                log.AppendLine($"═══════════════════════════════════════════════════");
 
-                sb.AppendLine($"Ведущий столбец: {GetVariableName(pivotCol)} (индекс {pivotCol})");
-                sb.AppendLine($"Коэффициент в целевой функции: {table[0, pivotCol]:F4}");
+                log.AppendLine("\nТекущая таблица:");
+                log.AppendLine(GetTableString(table, basis));
 
-                pivotRow = FindPivotRow(pivotCol);
+                // Проверяем, остались ли искусственные переменные в базисе
+                bool hasArtificialInBasis = false;
+                for (int i = 0; i < basis.Count; i++)
+                {
+                    if (basis[i] >= task.n + slackCount)
+                    {
+                        hasArtificialInBasis = true;
+                        break;
+                    }
+                }
+
+                if (!hasArtificialInBasis)
+                {
+                    log.AppendLine("\n✅ Все искусственные переменные исключены из базиса!");
+                    double wValue = table[0, cols - 1];
+
+                    if (Math.Abs(wValue) > 0.0001)
+                    {
+                        log.AppendLine($"❌ W = {wValue:F3} ≠ 0");
+                        log.AppendLine("Задача не имеет допустимого решения!");
+                        return false;
+                    }
+
+                    log.AppendLine($"✅ W = {wValue:F3} = 0");
+                    log.AppendLine("Допустимое решение найдено!");
+
+                    this.table = table;
+                    this.basis = basis;
+                    return true;
+                }
+
+                // Находим первую искусственную переменную в базисе
+                int pivotRow = -1;
+                int artificialVar = -1;
+                for (int i = 0; i < basis.Count; i++)
+                {
+                    if (basis[i] >= task.n + slackCount)
+                    {
+                        pivotRow = i + 1;
+                        artificialVar = basis[i];
+                        break;
+                    }
+                }
+
                 if (pivotRow == -1)
                 {
-                    sb.AppendLine("ОШИБКА: Задача неограничена - нет положительных коэффициентов в ведущем столбце");
-                    return sb.ToString();
+                    log.AppendLine("❌ Не удалось найти искусственную переменную в базисе");
+                    return false;
                 }
 
-                sb.AppendLine($"Ведущая строка: строка {pivotRow} (базисная переменная {GetVariableName(basis[pivotRow - 1])})");
-                sb.AppendLine($"Ведущий элемент: {table[pivotRow, pivotCol]:F4}");
+                log.AppendLine($"\nИскусственная переменная в базисе: {GetVariableName(artificialVar)}");
 
-                sb.AppendLine("\nОтношения для выбора ведущей строки:");
+                // Ищем переменную для ввода в базис вместо искусственной
+                int pivotCol = -1;
+                for (int j = 0; j < task.n + slackCount; j++) // Только не искусственные переменные
+                {
+                    if (Math.Abs(table[pivotRow, j]) > 0.0001 && !basis.Contains(j))
+                    {
+                        pivotCol = j;
+                        break;
+                    }
+                }
+
+                if (pivotCol == -1)
+                {
+                    // Проверяем, равна ли искусственная переменная 0
+                    if (Math.Abs(table[pivotRow, cols - 1]) < 0.0001)
+                    {
+                        log.AppendLine($"✅ Искусственная переменная {GetVariableName(artificialVar)} = 0");
+                        log.AppendLine("Можно удалить эту строку");
+
+                        // Удаляем искусственную переменную из базиса
+                        // Ищем любую небазисную переменную
+                        for (int j = 0; j < task.n + slackCount; j++)
+                        {
+                            if (!basis.Contains(j))
+                            {
+                                basis[pivotRow - 1] = j;
+                                break;
+                            }
+                        }
+                        continue;
+                    }
+
+                    log.AppendLine($"❌ Не удалось найти замену для искусственной переменной");
+                    return false;
+                }
+
+                log.AppendLine($"Вводим в базис: {GetVariableName(pivotCol)}");
+                log.AppendLine($"Выводим из базиса: {GetVariableName(artificialVar)}");
+                log.AppendLine($"Разрешающий элемент: a[{pivotRow},{pivotCol + 1}] = {table[pivotRow, pivotCol]:F3}");
+
+                // Обновляем базис
+                basis[pivotRow - 1] = pivotCol;
+
+                // Жордановы преобразования
+                double pivot = table[pivotRow, pivotCol];
+                for (int j = 0; j < cols; j++)
+                {
+                    table[pivotRow, j] /= pivot;
+                }
+
+                for (int i = 0; i < rows; i++)
+                {
+                    if (i != pivotRow)
+                    {
+                        double factor = table[i, pivotCol];
+                        if (Math.Abs(factor) > 0.0001)
+                        {
+                            for (int j = 0; j < cols; j++)
+                            {
+                                table[i, j] -= factor * table[pivotRow, j];
+                            }
+                        }
+                    }
+                }
+            }
+
+            log.AppendLine("❌ Превышено число итераций в фазе I!");
+            return false;
+        }
+
+        private (double[,] table, List<int> basis) BuildPhase2Problem()
+        {
+            try
+            {
+                if (this.table == null || this.basis == null)
+                {
+                    log.AppendLine("❌ Ошибка: нет результатов фазы I");
+                    return (null, null);
+                }
+
+                // Создаем таблицу для фазы II без искусственных переменных
+                int phase2Vars = task.n + slackCount;
+
+                double[,] table = new double[rows, phase2Vars + 1];
+                List<int> basis = new List<int>();
+
+                // Копируем строки ограничений (без искусственных переменных)
                 for (int i = 1; i < rows; i++)
+                {
+                    for (int j = 0; j < phase2Vars; j++)
+                    {
+                        table[i, j] = this.table[i, j];
+                    }
+                    table[i, phase2Vars] = this.table[i, this.cols - 1];
+
+                    // Копируем базисные переменные (только не искусственные)
+                    int basisVar = this.basis[i - 1];
+                    if (basisVar < phase2Vars) // Если не искусственная переменная
+                    {
+                        basis.Add(basisVar);
+                    }
+                }
+
+                // Целевая функция фазы II
+                // Для максимизации: Z = -cᵢxᵢ
+                // Для минимизации: Z = cᵢxᵢ
+                for (int j = 0; j < phase2Vars; j++)
+                {
+                    table[0, j] = 0;
+                }
+
+                if (task.taskType == 1) // Максимизация
+                {
+                    for (int i = 0; i < task.n; i++)
+                    {
+                        table[0, i] = -task.c[i]; // Для максимизации берем с отрицательным знаком
+                    }
+                }
+                else // Минимизация
+                {
+                    for (int i = 0; i < task.n; i++)
+                    {
+                        table[0, i] = task.c[i]; // Для минимизации берем с положительным знаком
+                    }
+                }
+                table[0, phase2Vars] = 0;
+
+                // Преобразуем целевую функцию для текущего базиса
+                for (int i = 0; i < basis.Count && i + 1 < rows; i++)
+                {
+                    int basisVar = basis[i];
+                    double coeff = table[0, basisVar];
+                    if (Math.Abs(coeff) > 0.0001)
+                    {
+                        for (int j = 0; j <= phase2Vars; j++)
+                        {
+                            table[0, j] -= coeff * table[i + 1, j];
+                        }
+                    }
+                }
+
+                log.AppendLine($"\nФаза II: {phase2Vars} переменных");
+                log.AppendLine("Начальная таблица фазы II:");
+                log.AppendLine(GetTableString(table, basis));
+
+                return (table, basis);
+            }
+            catch (Exception ex)
+            {
+                log.AppendLine($"❌ Ошибка в BuildPhase2Problem: {ex.Message}");
+                return (null, null);
+            }
+        }
+
+        private void SolvePhase2(double[,] table, List<int> basis)
+        {
+            if (table == null || basis == null) return;
+
+            int iteration = 0;
+            int maxIterations = 100;
+
+            while (iteration < maxIterations)
+            {
+                iteration++;
+
+                log.AppendLine($"\n═══════════════════════════════════════════════════");
+                log.AppendLine($"ФАЗА II - ИТЕРАЦИЯ {iteration}:");
+                log.AppendLine($"═══════════════════════════════════════════════════");
+
+                log.AppendLine("\nТекущая таблица:");
+                log.AppendLine(GetTableString(table, basis));
+
+                // Проверка оптимальности
+                bool optimal = true;
+                int pivotCol = -1;
+                double minDelta = 0;
+
+                log.Append("\nОценки: ");
+                int tableCols = table.GetLength(1);
+                for (int j = 0; j < tableCols - 1; j++)
+                {
+                    string sign = table[0, j] >= 0 ? "+" : "";
+                    log.Append($"Δ{j + 1}={sign}{table[0, j]:F3} ");
+
+                    if (table[0, j] < minDelta - 0.0001)
+                    {
+                        optimal = false;
+                        minDelta = table[0, j];
+                        pivotCol = j;
+                    }
+                }
+
+                if (optimal)
+                {
+                    // Вычисляем значение целевой функции с правильным знаком
+                    double objectiveValue = -table[0, tableCols - 1]; // Инвертируем знак
+
+                    log.AppendLine($"\n\n✅ Оптимальное решение найдено!");
+                    log.AppendLine($"Значение целевой функции: {objectiveValue:F6}");
+
+                    this.table = table;
+                    this.basis = basis;
+                    this.cols = tableCols;
+                    this.rows = table.GetLength(0);
+                    break;
+                }
+
+                log.AppendLine($"\nВводим в базис: {GetVariableName(pivotCol)} (Δ={minDelta:F3})");
+
+                // Выбор выводимой переменной
+                int pivotRow = -1;
+                double minRatio = double.MaxValue;
+                int tableRows = table.GetLength(0);
+
+                log.AppendLine("\nОтношения bᵢ/aᵢⱼ:");
+                for (int i = 1; i < tableRows; i++)
                 {
                     if (table[i, pivotCol] > 0.0001)
                     {
-                        double ratio = table[i, cols - 1] / table[i, pivotCol];
-                        sb.AppendLine($"  Строка {i}: {table[i, cols - 1]:F2} / {table[i, pivotCol]:F2} = {ratio:F2}");
+                        double ratio = table[i, tableCols - 1] / table[i, pivotCol];
+                        log.AppendLine($"  Строка {i}: {table[i, tableCols - 1]:F3}/{table[i, pivotCol]:F3} = {ratio:F3}");
+
+                        if (ratio < minRatio - 0.0001 && ratio >= 0)
+                        {
+                            minRatio = ratio;
+                            pivotRow = i;
+                        }
+                    }
+                    else
+                    {
+                        log.AppendLine($"  Строка {i}: aᵢⱼ ≤ 0 - не подходит");
                     }
                 }
 
+                if (pivotRow == -1)
+                {
+                    log.AppendLine("\n❌ Задача неограничена!");
+                    return;
+                }
+
+                if (pivotRow - 1 >= basis.Count)
+                {
+                    log.AppendLine("\n❌ Ошибка: неверный индекс базисной переменной");
+                    return;
+                }
+
+                log.AppendLine($"\nВыводим из базиса: {GetVariableName(basis[pivotRow - 1])}");
+                log.AppendLine($"Разрешающий элемент: a[{pivotRow},{pivotCol + 1}] = {table[pivotRow, pivotCol]:F3}");
+
+                // Обновляем базис
                 basis[pivotRow - 1] = pivotCol;
-                sb.AppendLine($"Новая базисная переменная в строке {pivotRow}: {GetVariableName(pivotCol)}");
 
-                MakePivotStep(pivotRow, pivotCol);
-                sb.AppendLine("\nОбновленная симплекс-таблица:");
-                sb.AppendLine(GetTableString());
-            }
-
-            if (IsOptimal())
-            {
-                sb.AppendLine("\n═══════════════════════════════════════════════════");
-                sb.AppendLine("ОПТИМАЛЬНОЕ РЕШЕНИЕ ДОСТИГНУТО!");
-                sb.AppendLine("═══════════════════════════════════════════════════");
-
-                sb.AppendLine(GetFinalSolution());
-            }
-
-            return sb.ToString();
-        }
-
-        private bool IsOptimal()
-        {
-            for (int j = 0; j < cols - 1; j++)
-            {
-                if (table[0, j] < -0.0001)
-                    return false;
-            }
-            return true;
-        }
-
-        private int FindPivotColumn()
-        {
-            int pivotCol = -1;
-            double minValue = 0;
-
-            for (int j = 0; j < cols - 1; j++)
-            {
-                if (table[0, j] < minValue)
+                // Жордановы преобразования
+                double pivot = table[pivotRow, pivotCol];
+                for (int j = 0; j < tableCols; j++)
                 {
-                    minValue = table[0, j];
-                    pivotCol = j;
+                    table[pivotRow, j] /= pivot;
                 }
-            }
 
-            return pivotCol;
-        }
-
-        private int FindPivotRow(int pivotCol)
-        {
-            int pivotRow = -1;
-            double minRatio = double.MaxValue;
-
-            for (int i = 1; i < rows; i++)
-            {
-                if (table[i, pivotCol] > 0.0001)
+                for (int i = 0; i < tableRows; i++)
                 {
-                    double ratio = table[i, cols - 1] / table[i, pivotCol];
-                    if (ratio < minRatio && ratio >= 0)
+                    if (i != pivotRow)
                     {
-                        minRatio = ratio;
-                        pivotRow = i;
+                        double factor = table[i, pivotCol];
+                        if (Math.Abs(factor) > 0.0001)
+                        {
+                            for (int j = 0; j < tableCols; j++)
+                            {
+                                table[i, j] -= factor * table[pivotRow, j];
+                            }
+                        }
                     }
                 }
             }
 
-            return pivotRow;
+            if (iteration >= maxIterations)
+            {
+                log.AppendLine("❌ Превышено число итераций в фазе II!");
+            }
         }
 
-        private void MakePivotStep(int pivotRow, int pivotCol)
+        private void SolveSinglePhase()
         {
-            double pivotValue = table[pivotRow, pivotCol];
+            log.AppendLine("\n═══════════════════════════════════════════════════");
+            log.AppendLine("ОДНОФАЗНЫЙ СИМПЛЕКС-МЕТОД");
+            log.AppendLine("═══════════════════════════════════════════════════");
 
-            // Делим ведущую строку на ведущий элемент
-            for (int j = 0; j < cols; j++)
+            var data = BuildSinglePhaseProblem();
+            if (data.table != null && data.basis != null)
             {
-                table[pivotRow, j] /= pivotValue;
+                SolvePhase2(data.table, data.basis);
             }
+        }
 
-            // Вычитаем ведущую строку из других строк
-            for (int i = 0; i < rows; i++)
+        private (double[,] table, List<int> basis) BuildSinglePhaseProblem()
+        {
+            try
             {
-                if (i != pivotRow)
+                slackCount = task.signs.Count(s => s == "<=");
+                totalVars = task.n + slackCount;
+
+                rows = task.m + 1;
+                cols = totalVars + 1;
+                double[,] table = new double[rows, cols];
+                List<int> basis = new List<int>();
+
+                int slackIndex = 0;
+
+                for (int i = 0; i < task.m; i++)
                 {
-                    double factor = table[i, pivotCol];
-                    for (int j = 0; j < cols; j++)
+                    for (int j = 0; j < task.n; j++)
                     {
-                        table[i, j] -= factor * table[pivotRow, j];
+                        table[i + 1, j] = task.A[i, j];
+                    }
+
+                    table[i + 1, cols - 1] = task.b[i];
+
+                    if (task.signs[i] == "<=")
+                    {
+                        int slackPos = task.n + slackIndex;
+                        table[i + 1, slackPos] = 1;
+                        basis.Add(slackPos);
+                        slackIndex++;
                     }
                 }
+
+                // Целевая функция
+                for (int j = 0; j < totalVars; j++)
+                {
+                    table[0, j] = 0;
+                }
+
+                if (task.taskType == 1) // Максимизация
+                {
+                    for (int i = 0; i < task.n; i++)
+                    {
+                        table[0, i] = -task.c[i];
+                    }
+                }
+                else // Минимизация
+                {
+                    for (int i = 0; i < task.n; i++)
+                    {
+                        table[0, i] = task.c[i];
+                    }
+                }
+                table[0, cols - 1] = 0;
+
+                // Преобразуем целевую функцию
+                for (int i = 0; i < basis.Count; i++)
+                {
+                    int basisVar = basis[i];
+                    double coeff = table[0, basisVar];
+                    if (Math.Abs(coeff) > 0.0001)
+                    {
+                        for (int j = 0; j < cols; j++)
+                        {
+                            table[0, j] -= coeff * table[i + 1, j];
+                        }
+                    }
+                }
+
+                log.AppendLine($"\nПеременные: {totalVars} (исходные: {task.n}, slack: {slackCount})");
+                log.AppendLine("Начальная таблица:");
+                log.AppendLine(GetTableString(table, basis));
+
+                return (table, basis);
+            }
+            catch (Exception ex)
+            {
+                log.AppendLine($"❌ Ошибка в BuildSinglePhaseProblem: {ex.Message}");
+                return (null, null);
             }
         }
 
-        private string GetTableString()
+        private void CountAuxiliaryVariables()
         {
+            slackCount = 0;
+            artificialCount = 0;
+
+            foreach (string sign in task.signs)
+            {
+                if (sign == "<=")
+                    slackCount++;
+                else if (sign == ">=")
+                {
+                    slackCount++;
+                    artificialCount++;
+                }
+                else if (sign == "=")
+                    artificialCount++;
+            }
+        }
+
+        private string GetTableString(double[,] table, List<int> basis)
+        {
+            if (table == null) return "❌ Таблица не создана";
+
             StringBuilder sb = new StringBuilder();
+            int vars = table.GetLength(1) - 1;
+            int tabRows = table.GetLength(0);
 
-            // Заголовок
             sb.Append("Базис\t");
-            for (int j = 0; j < cols - 1; j++)
+            for (int j = 0; j < vars; j++)
             {
-                sb.Append($"{GetVariableName(j)}\t");
+                sb.Append($"{GetVariableName(j),-10}");
             }
             sb.AppendLine("Решение");
 
-            // Строки
-            for (int i = 0; i < rows; i++)
+            sb.Append(new string('─', 8 + vars * 11 + 12));
+            sb.AppendLine();
+
+            for (int i = 0; i < tabRows; i++)
             {
                 if (i == 0)
                     sb.Append("Z\t");
-                else
+                else if (i - 1 < basis.Count)
                     sb.Append($"{GetVariableName(basis[i - 1])}\t");
+                else
+                    sb.Append("-\t");
 
-                for (int j = 0; j < cols; j++)
+                for (int j = 0; j < table.GetLength(1); j++)
                 {
-                    sb.Append($"{table[i, j]:F2}\t");
+                    string valueStr;
+                    if (j == vars && i > 0)
+                        valueStr = $"{table[i, j]:F6}";
+                    else if (i == 0 && j < vars)
+                        valueStr = $"{table[i, j]:+0.000;-0.000;0.000}";
+                    else
+                        valueStr = $"{table[i, j]:0.000}";
+
+                    sb.Append($"{valueStr,-10}");
                 }
                 sb.AppendLine();
             }
-
-            sb.Append("\nТекущий базис: " + string.Join(", ",
-                basis.Select(b => $"{GetVariableName(b)} = {table[basis.IndexOf(b) + 1, cols - 1]:F2}")));
 
             return sb.ToString();
         }
 
         private string GetVariableName(int index)
         {
+            if (index < 0) return "-";
+
             if (index < task.n)
                 return $"x{index + 1}";
-            else
+            else if (index < task.n + slackCount)
                 return $"s{index - task.n + 1}";
+            else if (index < totalVars)
+                return $"R{index - (task.n + slackCount) + 1}";
+            else
+                return $"v{index + 1}";
+        }
+
+        public string SolveWithSteps()
+        {
+            return log.ToString() + GetFinalSolution();
         }
 
         private string GetFinalSolution()
         {
-            StringBuilder sb = new StringBuilder();
+            if (table == null || basis == null)
+                return "\n❌ Решение не найдено!";
 
-            double[] solution = new double[cols - 1];
-            for (int i = 0; i < basis.Count; i++)
+            try
             {
-                solution[basis[i]] = table[i + 1, cols - 1];
-            }
+                StringBuilder sb = new StringBuilder();
 
-            sb.AppendLine("\nЗначения переменных:");
-            for (int i = 0; i < task.n; i++)
-            {
-                sb.AppendLine($"  x{i + 1} = {solution[i]:F4}");
-            }
+                sb.AppendLine("\n═══════════════════════════════════════════════════");
+                sb.AppendLine("ФИНАЛЬНОЕ РЕШЕНИЕ:");
+                sb.AppendLine("═══════════════════════════════════════════════════");
 
-            double objectiveValue = table[0, cols - 1];
-            // Корректируем знак для минимизации
-            if (task.taskType == 2) // Минимизация
-                objectiveValue = -objectiveValue;
+                double[] solution = new double[task.n];
 
-            sb.AppendLine($"\nОптимальное значение целевой функции:");
-            sb.AppendLine($"  F(X) = {objectiveValue:F4}");
-
-            sb.AppendLine("\nБазисные переменные:");
-            foreach (var basisVar in basis)
-            {
-                if (basisVar < task.n) // Только основные переменные
+                for (int i = 0; i < basis.Count && i + 1 < rows; i++)
                 {
-                    sb.AppendLine($"  {GetVariableName(basisVar)} = {table[basis.IndexOf(basisVar) + 1, cols - 1]:F4}");
+                    int basisVar = basis[i];
+                    if (basisVar >= 0 && basisVar < task.n)
+                    {
+                        solution[basisVar] = table[i + 1, cols - 1];
+                    }
                 }
-            }
 
-            return sb.ToString();
+                sb.AppendLine("\nЗначения переменных:");
+                for (int i = 0; i < task.n; i++)
+                {
+                    sb.AppendLine($"  x{i + 1} = {solution[i]:F6}");
+                }
+
+                double objectiveValue = 0;
+                for (int i = 0; i < task.n; i++)
+                {
+                    objectiveValue += task.c[i] * solution[i];
+                }
+
+                sb.AppendLine($"\nЗначение целевой функции:");
+                sb.AppendLine($"  F(X) = {objectiveValue:F6}");
+
+                if (task.taskType == 2) // Минимизация
+                {
+                    sb.AppendLine($"  (задача на минимизацию)");
+                }
+
+                sb.AppendLine("\nБазисные переменные:");
+                for (int i = 0; i < basis.Count && i + 1 < rows; i++)
+                {
+                    if (basis[i] >= 0)
+                    {
+                        sb.AppendLine($"  {GetVariableName(basis[i])} = {table[i + 1, cols - 1]:F6}");
+                    }
+                }
+
+                return sb.ToString();
+            }
+            catch (Exception ex)
+            {
+                return $"\n❌ Ошибка при выводе решения: {ex.Message}";
+            }
         }
     }
 }
