@@ -13,7 +13,7 @@ namespace LinearProgrammingGUI
         
         private int? selectedTaskId = null;
         private LPTask currentTask;
-        private bool hasTask = false; // Флаг, указывающий, что задача выбрана
+        private bool hasTask = false;
 
         public DualTaskForm()
         {
@@ -77,7 +77,7 @@ namespace LinearProgrammingGUI
         {
             selectedTaskId = taskId;
             currentTask = task;
-            hasTask = true; // Устанавливаем флаг
+            hasTask = true;
             lblTitle.Text = $"ПОСТРОЕНИЕ ДВОЙСТВЕННОЙ ЗАДАЧИ (Задача №{taskId})";
             ProcessTask(currentTask);
         }
@@ -86,12 +86,10 @@ namespace LinearProgrammingGUI
         {
             if (hasTask)
             {
-                // Используем уже выбранную задачу
                 ProcessTask(currentTask);
             }
             else
             {
-                // Показываем диалог выбора задачи
                 ShowTaskSelectionDialog();
             }
         }
@@ -175,7 +173,6 @@ namespace LinearProgrammingGUI
         {
             try
             {
-                // Проверяем, что задача корректна
                 if (task.n == 0 || task.m == 0)
                 {
                     MessageBox.Show("Задача некорректна: отсутствуют переменные или ограничения",
@@ -183,19 +180,22 @@ namespace LinearProgrammingGUI
                     return;
                 }
 
-                LPTask dual = BuildDual(task);
+                // Строим двойственную задачу
+                var dualResult = BuildDualWithDetails(task);
+                LPTask dual = dualResult.DualTask;
+                bool?[] dualVarSignRestrictions = dualResult.DualVarSigns;
 
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine("================================================");
                 sb.AppendLine("ПРЯМАЯ ЗАДАЧА:");
                 sb.AppendLine("================================================");
-                sb.AppendLine(TaskToString(task, "x", "F"));
+                sb.AppendLine(TaskToString(task, "x", task.taskType == 1 ? "F" : "G", null, true));
 
                 sb.AppendLine();
                 sb.AppendLine("================================================");
                 sb.AppendLine("ДВОЙСТВЕННАЯ ЗАДАЧА:");
                 sb.AppendLine("================================================");
-                sb.AppendLine(TaskToString(dual, "y", "G"));
+                sb.AppendLine(TaskToString(dual, "y", dual.taskType == 1 ? "F" : "G", dualVarSignRestrictions, false));
 
                 sb.AppendLine();
                 sb.AppendLine("ПРАВИЛА ПОСТРОЕНИЯ ДВОЙСТВЕННОЙ ЗАДАЧИ:");
@@ -204,10 +204,12 @@ namespace LinearProgrammingGUI
                 sb.AppendLine("3. Направление оптимизации меняется на противоположное:");
                 sb.AppendLine("   - Максимизация становится минимизацией");
                 sb.AppendLine("   - Минимизация становится максимизацией");
-                sb.AppendLine("4. Знаки неравенств в ограничениях изменяются:");
-                sb.AppendLine("   - В прямой задаче <=  в двойственной =>");
-                sb.AppendLine("   - В прямой задаче =>  в двойственной <=");
-                sb.AppendLine("   - Равенства остаются равенствами");
+                sb.AppendLine("4. Для ограничений прямой задачи:");
+                sb.AppendLine("   - Если ограничение =, то переменная двойственной - любая");
+                sb.AppendLine("   - Если ограничение <=, то переменная двойственной >= 0");
+                sb.AppendLine("   - Если ограничение >=, то переменная двойственной <= 0");
+                sb.AppendLine("5. Для переменных прямой задачи (все >= 0):");
+                sb.AppendLine("   - Ограничения двойственной: >= при максимизации, <= при минимизации");
 
                 txtResult.Text = sb.ToString();
             }
@@ -218,72 +220,217 @@ namespace LinearProgrammingGUI
             }
         }
 
-        private LPTask BuildDual(LPTask primal)
+        private struct DualResult
+        {
+            public LPTask DualTask { get; set; }
+            public bool?[] DualVarSigns { get; set; } // null = любая, true = >= 0, false = <= 0
+        }
+
+        private DualResult BuildDualWithDetails(LPTask primal)
         {
             LPTask dual = new LPTask
             {
                 n = primal.m,
                 m = primal.n,
-                taskType = 3 - primal.taskType, // 1->2 (max->min), 2->1 (min->max)
-                c = primal.b,
-                b = primal.c,
+                taskType = (primal.taskType == 1) ? 2 : 1,
+                c = new double[primal.m],
+                b = new double[primal.n],
                 A = new double[primal.n, primal.m],
                 signs = new string[primal.n]
             };
 
-            // Транспонирование матрицы
-            for (int i = 0; i < dual.m; i++)
-                for (int j = 0; j < dual.n; j++)
-                    dual.A[i, j] = primal.A[j, i];
+            bool?[] dualVarSigns = new bool?[primal.m];
 
-            // Преобразование знаков неравенств
-            for (int i = 0; i < dual.m; i++)
+            // Копируем правые части и определяем знаки двойственных переменных
+            for (int i = 0; i < primal.m; i++)
             {
-                if (primal.signs[i] == "<=")
-                    dual.signs[i] = ">=";
+                dual.c[i] = primal.b[i];
+                
+                // Определяем знак двойственной переменной
+                if (primal.signs[i] == "=")
+                {
+                    dualVarSigns[i] = null; // Произвольный знак
+                }
+                else if (primal.signs[i] == "<=")
+                {
+                    dualVarSigns[i] = true; // >= 0
+                }
                 else if (primal.signs[i] == ">=")
-                    dual.signs[i] = "<=";
-                else // "="
-                    dual.signs[i] = "=";
+                {
+                    dualVarSigns[i] = false; // <= 0
+                }
+                else
+                {
+                    dualVarSigns[i] = true; // По умолчанию >= 0
+                }
             }
 
-            return dual;
+            // Копируем коэффициенты целевой функции
+            for (int j = 0; j < primal.n; j++)
+            {
+                dual.b[j] = primal.c[j];
+            }
+
+            // Транспонирование матрицы
+            for (int i = 0; i < primal.m; i++)
+            {
+                for (int j = 0; j < primal.n; j++)
+                {
+                    dual.A[j, i] = primal.A[i, j];
+                }
+            }
+
+            // Знаки ограничений двойственной задачи
+            for (int j = 0; j < dual.m; j++)
+            {
+                if (primal.taskType == 1) // Максимизация в прямой
+                {
+                    dual.signs[j] = ">=";
+                }
+                else // Минимизация в прямой
+                {
+                    dual.signs[j] = "<=";
+                }
+            }
+
+            return new DualResult
+            {
+                DualTask = dual,
+                DualVarSigns = dualVarSigns
+            };
         }
 
-        private string TaskToString(LPTask task, string varName, string funcName)
+        private string TaskToString(LPTask task, string varName, string funcName, bool?[] varSignRestrictions, bool isPrimal)
+{
+    StringBuilder sb = new StringBuilder();
+
+    // Целевая функция
+    sb.Append($"{funcName}({varName}) = ");
+    for (int i = 0; i < task.c.Length; i++)
+    {
+        if (i > 0)
         {
-            StringBuilder sb = new StringBuilder();
+            if (task.c[i] >= 0)
+                sb.Append(" + ");
+            else
+                sb.Append(" - ");
+        }
+        sb.Append($"{Math.Abs(task.c[i])}*{varName}{i + 1}");
+    }
+    sb.AppendLine(task.taskType == 1 ? " -> max" : " -> min");
 
-            // Целевая функция
-            sb.Append($"{funcName}({varName}) = ");
-            for (int i = 0; i < task.c.Length; i++)
+    // Ограничения
+    sb.AppendLine("\nОграничения:");
+    for (int i = 0; i < task.m; i++)
+    {
+        sb.Append("  ");
+        bool firstTerm = true;
+        for (int j = 0; j < task.n; j++)
+        {
+            double coeff = task.A[i, j];
+            if (Math.Abs(coeff) > 0.0001)
             {
-                if (i > 0 && task.c[i] >= 0) sb.Append(" + ");
-                sb.Append($"{task.c[i]}*{varName}{i + 1}");
-            }
-            sb.AppendLine(task.taskType == 1 ? " -> max" : " -> min");
-
-            // Ограничения
-            sb.AppendLine("\nОграничения:");
-            for (int i = 0; i < task.m; i++)
-            {
-                sb.Append("  ");
-                for (int j = 0; j < task.n; j++)
+                if (!firstTerm)
                 {
-                    if (j > 0 && task.A[i, j] >= 0) sb.Append(" + ");
-                    sb.Append($"{task.A[i, j]}*{varName}{j + 1}");
+                    if (coeff >= 0)
+                        sb.Append(" + ");
+                    else
+                        sb.Append(" - ");
                 }
-                sb.AppendLine($" {task.signs[i]} {task.b[i]}");
+                else
+                {
+                    firstTerm = false;
+                    if (coeff < 0)
+                        sb.Append("-");
+                }
+                sb.Append($"{Math.Abs(coeff)}*{varName}{j + 1}");
             }
+        }
+        if (firstTerm)
+        {
+            sb.Append("0");
+        }
+        sb.AppendLine($" {task.signs[i]} {task.b[i]}");
+    }
 
-            // Условия неотрицательности
-            sb.AppendLine("\nУсловия неотрицательности:");
-            for (int i = 0; i < task.n; i++)
-            {
-                sb.AppendLine($"  {varName}{i + 1} >= 0");
-            }
-
-            return sb.ToString();
+    // Условия на переменные
+    sb.AppendLine("\nУсловия на переменные:");
+    
+    if (isPrimal)
+    {
+        // Прямая задача - все переменные >= 0
+        for (int i = 0; i < task.n; i++)
+        {
+            sb.AppendLine($"  {varName}{i + 1} >= 0");
         }
     }
-}
+    else
+    {
+        // Двойственная задача
+        if (varSignRestrictions != null && varSignRestrictions.Length >= task.n)
+        {
+            for (int i = 0; i < task.n; i++)
+            {
+                if (varSignRestrictions[i] == null)
+                {
+                    sb.AppendLine($"  {varName}{i + 1} - любая (произвольного знака)");
+                }
+                else if (varSignRestrictions[i] == true)
+                {
+                    sb.AppendLine($"  {varName}{i + 1} >= 0");
+                }
+                else
+                {
+                    sb.AppendLine($"  {varName}{i + 1} <= 0");
+                }
+            }
+        }
+        else
+        {
+            // Определяем по ограничениям текущей задачи (прямой)
+            bool allEqualities = true;
+            
+            // Проверяем, что текущая задача инициализирована и есть знаки
+            if (currentTask.signs != null && currentTask.m > 0)
+            {
+                for (int i = 0; i < currentTask.m; i++)
+                {
+                    if (currentTask.signs[i] != "=")
+                    {
+                        allEqualities = false;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                allEqualities = false; // Если данных нет, считаем что не все равенства
+            }
+            
+            if (allEqualities)
+            {
+                // Все ограничения прямой - равенства
+                sb.Append("  ");
+                for (int i = 0; i < task.n; i++)
+                {
+                    sb.Append($"{varName}{i + 1}");
+                    if (i < task.n - 1) sb.Append(", ");
+                }
+                sb.AppendLine(" - любые (произвольного знака)");
+            }
+            else
+            {
+                // Есть неравенства - показываем по умолчанию >= 0
+                for (int i = 0; i < task.n; i++)
+                {
+                    sb.AppendLine($"  {varName}{i + 1} >= 0");
+                }
+            }
+        }
+    }
+
+    // Информация о размере
+    sb.AppendLine($"\nРазмерность: {task.n} переменных, {task.m} ограничений");
+
+    return sb.ToString();
+}}}
